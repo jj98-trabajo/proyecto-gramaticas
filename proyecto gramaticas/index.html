@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Gramáticas Dependientes de Contexto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .btn-option {
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+        }
+        .btn-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-option.correct {
+            background-color: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        .btn-option.incorrect {
+            background-color: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+        .btn-option.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+        .explanation-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-left: 4px solid #667eea;
+        }
+        .question-image {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            max-height: 300px;
+            object-fit: contain;
+        }
+        .question-image:hover {
+            transform: scale(1.02);
+        }
+        .image-placeholder {
+            background: linear-gradient(45deg, #f0f4ff, #e6f0ff);
+            border: 2px dashed #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8 fade-in">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">Cuestionario</h1>
+            <p class="text-xl text-white/90">Gramáticas Dependientes de Contexto</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="card p-4 mb-6 fade-in">
+            <div class="flex justify-between mb-2">
+                <span class="text-sm font-semibold text-gray-700">Progreso</span>
+                <span class="text-sm font-semibold text-gray-700" id="progress-text">0/9</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="progress-bar bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full" id="progress-bar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Quiz Card -->
+        <div class="card p-8 fade-in" id="quiz-container">
+            <!-- Topic Title -->
+            <div class="mb-6">
+                <span class="inline-block bg-purple-100 text-purple-800 text-sm font-semibold px-4 py-2 rounded-full" id="topic-name">
+                    Tema 1: Definición y Propiedades
+                </span>
+            </div>
+
+            <!-- Image section -->
+            <div class="mb-6" id="image-container">
+                <div class="image-placeholder question-image w-full h-64 rounded-lg flex flex-col items-center justify-center">
+                    <svg class="w-16 h-16 mb-4 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Diagrama de Autómatas</span>
+                </div>
+            </div>
+
+            <!-- Explanation section -->
+            <div class="explanation-section p-5 rounded-lg mb-6">
+                <h3 class="font-bold text-gray-800 mb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                    </svg>
+                    Concepto Clave
+                </h3>
+                <p class="text-gray-700 leading-relaxed" id="explanation-text"></p>
+            </div>
+
+            <!-- Question -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4" id="question-text">
+                    ¿Qué es una gramática dependiente de contexto?
+                </h2>
+                <p class="text-gray-600" id="question-number">Pregunta 1 de 9</p>
+            </div>
+
+            <!-- Options -->
+            <div class="space-y-4 mb-8" id="options-container">
+                <!-- Options will be inserted here by JavaScript -->
+            </div>
+
+            <!-- Feedback -->
+            <div class="hidden p-4 rounded-lg mb-6" id="feedback">
+                <p class="font-semibold" id="feedback-text"></p>
+            </div>
+
+            <!-- Next Button -->
+            <div class="flex justify-end">
+                <button id="next-btn" class="hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-8 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                    Siguiente Pregunta →
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Card (Hidden initially) -->
+        <div class="card p-8 hidden fade-in" id="results-container">
+            <div class="text-center">
+                <div class="text-6xl mb-4" id="results-emoji"></div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">¡Cuestionario Completado!</h2>
+                <p class="text-xl text-gray-600 mb-6">Tu puntuación final:</p>
+                <div class="text-6xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-8" id="final-score">
+                    0/9
+                </div>
+                <div class="mb-8">
+                    <div class="inline-block bg-gray-100 rounded-lg p-6">
+                        <p class="text-lg text-gray-700" id="results-message"></p>
+                    </div>
+                </div>
+                <button onclick="restartQuiz()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-8 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                    Reiniciar Cuestionario
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            // Tema 1: Definición y Propiedades
+            {
+                topic: "Tema 1: Definición y Propiedades",
+                image: "placeholder",
+                imageText: "Diagrama de Teoría de Autómatas",
+                explanation: "Las gramáticas dependientes de contexto (CSG) son un tipo de gramática formal donde las reglas de producción permiten que un símbolo no terminal se reemplace considerando su contexto. En estas gramáticas, las producciones tienen la forma αAβ → αγβ, donde A es un no terminal y α, β, γ son cadenas de símbolos. Esto las hace más poderosas que las gramáticas independientes de contexto.",
+                question: "¿Qué es una gramática dependiente de contexto (CSG)?",
+                options: [
+                    "Una gramática donde las producciones tienen la forma αAβ → αγβ, con A no terminal",
+                    "Una gramática donde solo se permiten producciones de tipo A → a",
+                    "Una gramática que genera lenguajes regulares",
+                    "Una gramática sin restricciones de ningún tipo"
+                ],
+                correct: 0
+            },
+            {
+                topic: "Tema 1: Definición y Propiedades",
+                image: "placeholder",
+                imageText: "Jerarquía de Chomsky - Tipo 1",
+                explanation: "Una característica fundamental de las CSG es que son 'no acortantes' (non-contracting). Esto significa que en cada regla de producción, la cadena del lado derecho debe ser al menos tan larga como la del lado izquierdo. Esta propiedad es crucial porque garantiza que la derivación de cadenas no pierda información durante el proceso de generación.",
+                question: "¿Cuál es la restricción principal en las producciones de una CSG?",
+                options: [
+                    "El lado izquierdo debe tener solo terminales",
+                    "El lado derecho debe ser más largo o igual que el lado izquierdo (no acortante)",
+                    "Solo puede haber un símbolo en cada lado",
+                    "No puede contener símbolos no terminales"
+                ],
+                correct: 1
+            },
+            {
+                topic: "Tema 1: Definición y Propiedades",
+                image: "placeholder",
+                imageText: "Jerarquía de Chomsky - Niveles",
+                explanation: "La jerarquía de Chomsky clasifica las gramáticas formales en cuatro niveles. Las gramáticas dependientes de contexto corresponden al Tipo 1, ubicándose entre las gramáticas sin restricciones (Tipo 0) y las gramáticas independientes de contexto (Tipo 2). Esta posición indica su capacidad expresiva: más poderosas que las CFG pero con restricciones que las hacen computacionalmente manejables.",
+                question: "En la jerarquía de Chomsky, ¿qué tipo corresponde a las gramáticas dependientes de contexto?",
+                options: [
+                    "Tipo 0",
+                    "Tipo 1",
+                    "Tipo 2",
+                    "Tipo 3"
+                ],
+                correct: 1
+            },
+            
+            // Tema 2: Lenguajes y Autómatas
+            {
+                topic: "Tema 2: Lenguajes y Autómatas",
+                image: "placeholder",
+                imageText: "Autómata Linealmente Acotado (LBA)",
+                explanation: "Los lenguajes dependientes de contexto son reconocidos por autómatas linealmente acotados (LBA). Un LBA es similar a una máquina de Turing, pero con una restricción crucial: su cinta de trabajo está limitada al tamaño de la cadena de entrada multiplicado por una constante. Esta limitación de memoria hace que los LBA sean equivalentes en poder computacional a las gramáticas dependientes de contexto.",
+                question: "¿Qué tipo de autómata reconoce los lenguajes dependientes de contexto?",
+                options: [
+                    "Autómata finito determinista (DFA)",
+                    "Autómata de pila (PDA)",
+                    "Autómata linealmente acotado (LBA)",
+                    "Máquina de Turing sin restricciones"
+                ],
+                correct: 2
+            },
+            {
+                topic: "Tema 2: Lenguajes y Autómatas",
+                image: "placeholder",
+                imageText: "Autómata de Pila (PDA)",
+                explanation: "El lenguaje L = {aⁿbⁿcⁿ | n ≥ 0} es un ejemplo clásico que diferencia lenguajes dependientes de contexto de los independientes. Este lenguaje requiere contar y comparar tres tipos de símbolos simultáneamente, algo que no puede hacer un autómata de pila (que reconoce CFG). Sin embargo, un LBA sí puede verificar esta condición usando su memoria limitada, demostrando que es context-sensitive.",
+                question: "¿Cuál de los siguientes lenguajes es dependiente de contexto pero NO independiente de contexto?",
+                options: [
+                    "L = {aⁿbⁿ | n ≥ 0}",
+                    "L = {aⁿbⁿcⁿ | n ≥ 0}",
+                    "L = {aⁿ | n ≥ 0}",
+                    "L = {(ab)ⁿ | n ≥ 0}"
+                ],
+                correct: 1
+            },
+            {
+                topic: "Tema 2: Lenguajes y Autómatas",
+                image: "placeholder",
+                imageText: "Máquina de Turing Limitada",
+                explanation: "La característica definitoria de un autómata linealmente acotado es su limitación de espacio. A diferencia de una máquina de Turing completa que tiene cinta infinita, un LBA solo puede usar la porción de cinta ocupada por la entrada (más posiblemente algunos símbolos delimitadores). Esta restricción es suficiente para reconocer todos los lenguajes context-sensitive pero insuficiente para lenguajes más complejos.",
+                question: "¿Qué característica tiene un autómata linealmente acotado (LBA)?",
+                options: [
+                    "Tiene memoria infinita",
+                    "Su cinta está limitada al tamaño de la entrada",
+                    "No puede leer la entrada más de una vez",
+                    "Solo se mueve hacia la derecha"
+                ],
+                correct: 1
+            },
+            
+            // Tema 3: Propiedades de Clausura
+            {
+                topic: "Tema 3: Propiedades de Clausura",
+                image: "placeholder",
+                imageText: "Operación de Unión",
+                explanation: "Las propiedades de clausura describen qué operaciones preservan una clase de lenguajes. Los lenguajes dependientes de contexto SÍ son cerrados bajo la operación de unión. Esto significa que si L₁ y L₂ son lenguajes context-sensitive, entonces L₁ ∪ L₂ también lo es. Esto se puede demostrar construyendo una gramática que combine las producciones de ambos lenguajes con un nuevo símbolo inicial.",
+                question: "¿Los lenguajes dependientes de contexto son cerrados bajo la operación de unión?",
+                options: [
+                    "Sí, siempre",
+                    "No, nunca",
+                    "Solo en casos especiales",
+                    "Depende del alfabeto"
+                ],
+                correct: 0
+            },
+            {
+                topic: "Tema 3: Propiedades de Clausura",
+                image: "placeholder",
+                imageText: "Operación de Complemento",
+                explanation: "La clausura bajo complemento de los lenguajes context-sensitive fue un problema abierto durante décadas. Finalmente, Immerman y Szelepcsényi probaron independientemente en 1988 que los lenguajes reconocidos por LBA (y por tanto, los context-sensitive) SÍ son cerrados bajo complemento. Este resultado, conocido como el teorema de Immerman-Szelepcsényi, es uno de los logros más importantes en teoría de la computación.",
+                question: "¿Los lenguajes dependientes de contexto son cerrados bajo complemento?",
+                options: [
+                    "Sí, está demostrado (Teorema de Immerman-Szelepcsényi, 1988)",
+                    "No, está demostrado que no lo son",
+                    "Es un problema abierto en teoría de la computación",
+                    "Solo para lenguajes finitos"
+                ],
+                correct: 0
+            },
+            {
+                topic: "Tema 3: Propiedades de Clausura",
+                image: "placeholder",
+                imageText: "Operación de Intersección",
+                explanation: "Los lenguajes context-sensitive son cerrados bajo intersección. Si L₁ y L₂ son lenguajes dependientes de contexto reconocidos por LBA M₁ y M₂, podemos construir un LBA que simule ambas máquinas en paralelo usando pistas separadas en su cinta. El nuevo LBA acepta solo si ambas máquinas aceptan, demostrando que L₁ ∩ L₂ es context-sensitive. Sin embargo, NO son cerrados bajo complemento ni Kleene star.",
+                question: "¿Bajo cuál de estas operaciones SÍ son cerrados los lenguajes dependientes de contexto?",
+                options: [
+                    "Complemento",
+                    "Intersección",
+                    "Estrella de Kleene",
+                    "Todas las anteriores"
+                ],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        function loadQuestion() {
+            answered = false;
+            const data = quizData[currentQuestion];
+            
+            document.getElementById('topic-name').textContent = data.topic;
+            
+            // Set image placeholder with descriptive text
+            const imageContainer = document.getElementById('image-container');
+            imageContainer.innerHTML = `
+                <div class="image-placeholder question-image w-full h-64 rounded-lg flex flex-col items-center justify-center">
+                    <svg class="w-16 h-16 mb-4 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-center px-4">${data.imageText}</span>
+                </div>
+            `;
+            
+            // Set explanation
+            document.getElementById('explanation-text').textContent = data.explanation;
+            
+            document.getElementById('question-text').textContent = data.question;
+            document.getElementById('question-number').textContent = `Pregunta ${currentQuestion + 1} de ${quizData.length}`;
+            document.getElementById('feedback').classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+            
+            // Load options
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            data.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'btn-option w-full text-left p-4 rounded-lg bg-gray-50 hover:bg-gray-100 font-medium text-gray-800';
+                button.innerHTML = `
+                    <span class="inline-block w-8 h-8 rounded-full bg-purple-500 text-white text-center leading-8 mr-3 font-bold">
+                        ${String.fromCharCode(65 + index)}
+                    </span>
+                    ${option}
+                `;
+                button.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(button);
+            });
+            
+            updateProgress();
+        }
+
+        function selectAnswer(selectedIndex) {
+            if (answered) return;
+            
+            answered = true;
+            const data = quizData[currentQuestion];
+            const buttons = document.querySelectorAll('.btn-option');
+            
+            buttons.forEach((btn, index) => {
+                btn.classList.add('disabled');
+                if (index === data.correct) {
+                    btn.classList.add('correct');
+                } else if (index === selectedIndex) {
+                    btn.classList.add('incorrect');
+                }
+            });
+            
+            const feedback = document.getElementById('feedback');
+            const feedbackText = document.getElementById('feedback-text');
+            
+            if (selectedIndex === data.correct) {
+                score++;
+                feedback.classList.remove('hidden', 'bg-red-100');
+                feedback.classList.add('bg-green-100');
+                feedbackText.innerHTML = '✅ ¡Correcto! Excelente conocimiento.';
+            } else {
+                feedback.classList.remove('hidden', 'bg-green-100');
+                feedback.classList.add('bg-red-100');
+                feedbackText.innerHTML = `❌ Incorrecto. La respuesta correcta es: <strong>${data.options[data.correct]}</strong>`;
+            }
+            
+            document.getElementById('next-btn').classList.remove('hidden');
+            updateProgress();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + (answered ? 1 : 0)) / quizData.length) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = `${currentQuestion + (answered ? 1 : 0)}/${quizData.length}`;
+        }
+
+        function showResults() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('results-container').classList.remove('hidden');
+            
+            const percentage = (score / quizData.length) * 100;
+            document.getElementById('final-score').textContent = `${score}/${quizData.length}`;
+            
+            let emoji, message;
+            if (percentage === 100) {
+                emoji = '🏆';
+                message = '¡Perfecto! Dominas completamente las gramáticas dependientes de contexto.';
+            } else if (percentage >= 70) {
+                emoji = '🎉';
+                message = '¡Muy bien! Tienes un buen conocimiento del tema.';
+            } else if (percentage >= 50) {
+                emoji = '👍';
+                message = 'Bien hecho. Considera repasar algunos conceptos.';
+            } else {
+                emoji = '📚';
+                message = 'Sigue estudiando. Las gramáticas dependientes de contexto requieren práctica.';
+            }
+            
+            document.getElementById('results-emoji').textContent = emoji;
+            document.getElementById('results-message').textContent = message;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('results-container').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        // Event Listeners
+        document.getElementById('next-btn').addEventListener('click', nextQuestion);
+
+        // Load first question on page load
+        window.onload = () => {
+            loadQuestion();
+        };
+    </script>
+</body>
+</html>
